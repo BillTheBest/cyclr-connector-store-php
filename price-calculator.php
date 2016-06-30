@@ -12,13 +12,7 @@ get_header(); ?>
 
 <div class="price-calculator-box">
     <?php the_content(); ?>
-    
-    <div class="box-connector-price">
-        <input id="numworkflows" type="text" />
-        <p class="connector-name">Workflows</p>
-        <p class="connector-price">$20/month</p>
-    </div>   
-    
+     
     <div id="calculator"> 
     </div>
 
@@ -73,17 +67,22 @@ get_header(); ?>
 				return 0;
 			}
 			foreach($store->getConnectors(100) as $connector){
-				echo '{icon:"'.$connector->Icon.'", name: "'.$connector->Name.'", price:'.getPrice($connector).'},';
+				echo '{icon:"'.$connector->Icon.'", name: "'.$connector->Name.'", price:'.getPrice($connector).', status: "'.$connector->Status.'"},';
 			}
 		?>
 	];
-
+  
+  var cycleCount = 1;
   var selectedConnectors = [];
 
   var calculator = React.createClass(
   {
     displayName: 'calculator',
-    render: function() {
+	handleChange: function(event) {
+		cycleCount = event.target.value;
+    	renderCalc();
+  	},
+  	render: function() {
       if(this.props.connectors.length == 0)
         return (<div>
           <div className="fusion-alert alert success alert-dismissable alert-success alert-shadow">
@@ -100,6 +99,11 @@ get_header(); ?>
       });
 
       return (<div className="monthly-price">
+      			<div className="box-connector-price">
+      				<input id="numworkflows" type="number" min="1" value={cycleCount} onChange={this.handleChange}/>
+      				<p className="connector-name">Workflows</p>
+      				<p className="connector-price">${this.props.cyclePrice}/month</p>
+      			</div>
           {connectorNodes}
           <div className="box-connector-price monthly-total">
               <p className="total">= ${this.props.totalPrice}</p>
@@ -127,14 +131,23 @@ get_header(); ?>
 			render: function() {
 				var originalThis = this;
 				var connectorRows = this.props.connectors.map(function(connector, i) {
-					var btn = originalThis.props.selectedConnectors.filter(function(c){ if(c.name == connector.name) return c;}).length == 0 ?
-						(<a onClick={originalThis.handleAdd.bind(originalThis, connector.name)} className="fusion-button button-flat button-pill button-small button-custom button-5" href="javascript:void(0);">
-								<i className="fa fa-plus button-icon-left"></i> <span className="fusion-button-text">Add</span>
-						</a>)
-						:
-						(<a onClick={originalThis.handleRemove.bind(originalThis, connector.name)} className="fusion-button button-flat button-pill button-small button-custom button-5" href="javascript:void(0);">
-							<i className="fa fa-minus button-icon-left"></i> <span className="fusion-button-text">Remove</span>
-						</a>)
+					var disabledStyle = {
+						cursor: 'not-allowed',
+    					opacity: '.65'
+					};
+					if (connector.status == 'ComingSoon')
+						var btn = (<a className="fusion-button button-flat button-pill button-small button-custom button-5" style={disabledStyle} href="javascript:void(0);">
+								<i className="fa fa-clock-o button-icon-left"></i> <span className="fusion-button-text">Coming Soon</span>
+							</a>);
+					else
+						var btn = originalThis.props.selectedConnectors.filter(function(c){ if(c.name == connector.name) return c;}).length == 0 ?
+							(<a onClick={originalThis.handleAdd.bind(originalThis, connector.name)} className="fusion-button button-flat button-pill button-small button-custom button-5" href="javascript:void(0);">
+									<i className="fa fa-plus button-icon-left"></i> <span className="fusion-button-text">Add</span>
+							</a>)
+							:
+							(<a onClick={originalThis.handleRemove.bind(originalThis, connector.name)} className="fusion-button button-flat button-pill button-small button-custom button-5" href="javascript:void(0);">
+								<i className="fa fa-minus button-icon-left"></i> <span className="fusion-button-text">Remove</span>
+							</a>);
 	        return (<tr key={connector.name}>
 							<td>
 									<img src={connector.icon} /> {connector.name}
@@ -152,10 +165,12 @@ get_header(); ?>
 	renderCalc();
 
 	function renderCalc(){
+	  var cyclePrice = cycleCount * 10;
 	  ReactDOM.render(
 	    React.createElement(calculator, {
-	      connectors : selectedConnectors,
-	      totalPrice: selectedConnectors.reduce((v,i) => {return v + i.price; }, 0)
+	      connectors: selectedConnectors,
+	      cyclePrice: cyclePrice,
+	      totalPrice: cyclePrice + selectedConnectors.reduce((v,i) => {return v + i.price; }, 0)
 	    }),
 	    document.getElementById('calculator')
 	  );
