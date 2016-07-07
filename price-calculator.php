@@ -7,7 +7,6 @@ get_header(); ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
-
 <div id="content" <?php Avada()->layout->add_class( 'content_class' ); ?> style="width: 100%;" >
 
 <div class="price-calculator-box">
@@ -19,11 +18,10 @@ get_header(); ?>
     <p style="text-align: center;"><span class="fa fa-heart" style="color: #F44336;"></span> Easy and predictable pricing, no long contracts, unlimited data (<a href="#billing">learn more</a>)</p>
 
 
-<style type="text/css" scoped="scoped">.fusion-button.button-1 .fusion-button-text, .fusion-button.button-1 i {color:#fff;}.fusion-button.button-1 {border-width:0px;border-color:#fff;}.fusion-button.button-1 .fusion-button-icon-divider{border-color:#fff;}.fusion-button.button-1:hover .fusion-button-text, .fusion-button.button-1:hover i,.fusion-button.button-1:focus .fusion-button-text, .fusion-button.button-1:focus i,.fusion-button.button-1:active .fusion-button-text, .fusion-button.button-1:active{color:#fff;}.fusion-button.button-1:hover, .fusion-button.button-1:focus, .fusion-button.button-1:active{border-width:0px;border-color:#fff;}.fusion-button.button-1:hover .fusion-button-icon-divider, .fusion-button.button-1:hover .fusion-button-icon-divider, .fusion-button.button-1:active .fusion-button-icon-divider{border-color:#fff;}.fusion-button.button-1{background: #FF80AB;}.fusion-button.button-1:hover,.button-1:focus,.fusion-button.button-1:active{background: #FF4081;}.fusion-button.button-1{width:auto; margin: 15px 0;}</style>
-    <p style="text-align: center;"><a class="fusion-button button-flat button-pill button-xlarge button-custom button-1" target="_self" title="Integrate Chargify" href="https://my.cyclr.com/account/beta"><i class="fa fa-check button-icon-left"></i><span class="fusion-button-text">Get Started For Free</span></a>
-</p>
 
-<style type="text/css" scoped="scoped">.fusion-button.button-5 .fusion-button-text, .fusion-button.button-5 i {color:#FF80AB;}.fusion-button.button-5 {border-width:1px;border-color:#FF80AB;margin-top: 30px;}.fusion-button.button-5 .fusion-button-icon-divider{border-color:#FF80AB;}.fusion-button.button-5:hover .fusion-button-text, .fusion-button.button-5:hover i,.fusion-button.button-5:focus .fusion-button-text, .fusion-button.button-5:focus i,.fusion-button.button-5:active .fusion-button-text, .fusion-button.button-5:active{color:#fff;}.fusion-button.button-5:hover, .fusion-button.button-5:focus, .fusion-button.button-5:active{border-width:1px;border-color:#fff;}.fusion-button.button-5:hover .fusion-button-icon-divider, .fusion-button.button-5:hover .fusion-button-icon-divider, .fusion-button.button-5:active .fusion-button-icon-divider{border-color:#fff;}.fusion-button.button-5{background: #fff;}.fusion-button.button-5:hover,.button-5:focus,.fusion-button.button-5:active{background: #FF80AB;}.fusion-button.button-5{width:auto; margin-top: 15px;}</style>
+<p id='get-started' style="text-align: center;"></p>
+
+
     <table id='calculator-connector-list' class="table-2 connector-price-table">
     </table>
 
@@ -74,6 +72,27 @@ get_header(); ?>
   
   var cycleCount = 1;
   var selectedConnectors = [];
+  window.selectedConnetors = selectedConnectors;
+
+  var getStarted = React.createClass({
+    displayName: 'get-started',
+    handleClick: function() {
+       var qs = '';
+       var connectors = this.props.selectedConnectors;
+       for(var i = 0; i < connectors.length; i++) {
+          var c = connectors[i];
+          if(i == 0)
+              qs = '?'
+          else
+              qs += '&';
+          qs += 'c=' + encodeURIComponent(c.name);
+       }
+       window.location = 'https://my.cyclr.com/connector/seed' + qs;
+    },
+    render: function(){
+       return (<a className="fusion-button button-flat button-pill button-xlarge button-custom button-1" href="javascript:void(0);" onClick={this.handleClick}><i className="fa fa-check button-icon-left"></i><span className="fusion-button-text">Get Started For Free</span></a>);
+    }
+  });
 
   var calculator = React.createClass(
   {
@@ -181,8 +200,19 @@ get_header(); ?>
 			}),
 	    document.getElementById('calculator-connector-list')
 		);
+
+ReactDOM.render(
+			React.createElement(getStarted , {
+				selectedConnectors: selectedConnectors
+			}),
+	    document.getElementById('get-started')
+		);
 	}
 </script>
+
+
+<style type="text/css" scoped="scoped">.fusion-button.button-1 .fusion-button-text, .fusion-button.button-1 i {color:#fff;}.fusion-button.button-1 {border-width:0px;border-color:#fff;}.fusion-button.button-1 .fusion-button-icon-divider{border-color:#fff;}.fusion-button.button-1:hover .fusion-button-text, .fusion-button.button-1:hover i,.fusion-button.button-1:focus .fusion-button-text, .fusion-button.button-1:focus i,.fusion-button.button-1:active .fusion-button-text, .fusion-button.button-1:active{color:#fff;}.fusion-button.button-1:hover, .fusion-button.button-1:focus, .fusion-button.button-1:active{border-width:0px;border-color:#fff;}.fusion-button.button-1:hover .fusion-button-icon-divider, .fusion-button.button-1:hover .fusion-button-icon-divider, .fusion-button.button-1:active .fusion-button-icon-divider{border-color:#fff;}.fusion-button.button-1{background: #FF80AB;}.fusion-button.button-1:hover,.button-1:focus,.fusion-button.button-1:active{background: #FF4081;}.fusion-button.button-1{width:auto; margin: 15px 0;}</style>
+<style type="text/css" scoped="scoped">.fusion-button.button-5 .fusion-button-text, .fusion-button.button-5 i {color:#FF80AB;}.fusion-button.button-5 {border-width:1px;border-color:#FF80AB;margin-top: 30px;}.fusion-button.button-5 .fusion-button-icon-divider{border-color:#FF80AB;}.fusion-button.button-5:hover .fusion-button-text, .fusion-button.button-5:hover i,.fusion-button.button-5:focus .fusion-button-text, .fusion-button.button-5:focus i,.fusion-button.button-5:active .fusion-button-text, .fusion-button.button-5:active{color:#fff;}.fusion-button.button-5:hover, .fusion-button.button-5:focus, .fusion-button.button-5:active{border-width:1px;border-color:#fff;}.fusion-button.button-5:hover .fusion-button-icon-divider, .fusion-button.button-5:hover .fusion-button-icon-divider, .fusion-button.button-5:active .fusion-button-icon-divider{border-color:#fff;}.fusion-button.button-5{background: #fff;}.fusion-button.button-5:hover,.button-5:focus,.fusion-button.button-5:active{background: #FF80AB;}.fusion-button.button-5{width:auto; margin-top: 15px;}</style>
 
 <?php do_action( 'avada_after_content' ); ?>
 <?php get_footer();
